@@ -7,12 +7,9 @@ import { PersonLink } from "@/components/table/person-link";
 import { TableSearch } from "@/components/table/table-controls";
 import { useDataTable } from "@/components/table/use-data-table";
 import type { MenteeRecord } from "@/lib/mentees";
-import { areasText, availabilityLabels } from "@/lib/mentor-options";
+import { availabilityLabels } from "@/lib/mentor-options";
 
 const column = createColumnHelper<Features, MenteeRecord>();
-
-const interestsOf = (mentee: MenteeRecord) =>
-  areasText(mentee.interests, mentee.otherInterests);
 
 const columns = column.columns([
   column.accessor("name", {
@@ -25,12 +22,12 @@ const columns = column.columns([
       />
     ),
   }),
-  column.accessor(interestsOf, {
+  column.accessor("otherInterests", {
     id: "interests",
     header: "Interests",
     cell: ({ row }) => (
       <span className="line-clamp-2 max-w-60 whitespace-normal">
-        {interestsOf(row.original)}
+        {row.original.otherInterests}
       </span>
     ),
   }),
@@ -57,7 +54,7 @@ export function WaitingMenteesTable({ mentees }: { mentees: MenteeRecord[] }) {
       mentee.name,
       mentee.email,
       mentee.occupation,
-      interestsOf(mentee),
+      mentee.otherInterests,
     ],
   });
 

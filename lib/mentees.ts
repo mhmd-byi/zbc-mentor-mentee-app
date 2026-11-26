@@ -18,7 +18,6 @@ export type MenteeRecord = {
   dateOfBirth: string;
   education: string;
   occupation: string;
-  interests: string[];
   otherInterests: string;
   goals: string;
   availability: string[];
@@ -42,7 +41,6 @@ function toRecord(user: WithId<UserDocument>): MenteeRecord {
     dateOfBirth: mentee ? formatDate(new Date(mentee.dateOfBirth)) : "",
     education: mentee?.education ?? "",
     occupation: mentee?.occupation ?? "",
-    interests: mentee?.interests ?? [],
     otherInterests: mentee?.otherInterests ?? "",
     goals: mentee?.goals ?? "",
     availability: mentee?.availability ?? [],

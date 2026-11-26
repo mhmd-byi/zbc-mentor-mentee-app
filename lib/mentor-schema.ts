@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { MENTEE_LIMIT_OPTIONS } from "./mentor-options";
 import {
-  areaRule,
   areasSchema,
   availabilitySchema,
   passwordRule,
@@ -40,8 +39,7 @@ const detailsShape = {
     .trim()
     .regex(/^([0-9]|[1-5][0-9]|60)$/, "Enter a number of years from 0 to 60.")
     .transform(Number),
-  expertise: areasSchema,
-  otherExpertise: z.string().trim().max(200, "Use 200 characters or fewer."),
+  otherExpertise: areasSchema("Add at least one area of expertise."),
   availability: availabilitySchema,
   bio: z
     .string()
@@ -51,15 +49,7 @@ const detailsShape = {
   maxMentees: maxMenteesSchema,
 };
 
-const expertiseRule = areaRule(
-  "expertise",
-  "otherExpertise",
-  "Add at least one area of expertise.",
-);
-
-export const mentorDetailsSchema = z
-  .object(detailsShape)
-  .refine(expertiseRule.check, expertiseRule.params);
+export const mentorDetailsSchema = z.object(detailsShape);
 
 export const mentorApplicationSchema = z
   .object({
@@ -68,17 +58,14 @@ export const mentorApplicationSchema = z
     password: passwordSchema,
     confirmation: z.string(),
   })
-  .refine(expertiseRule.check, expertiseRule.params)
   .refine(passwordRule.check, passwordRule.params);
 
 // Same fields, so one form serves both. Resubmitting ignores the account ones.
-export const resubmissionFormSchema = z
-  .object({
-    ...detailsShape,
-    email: z.string(),
-    password: z.string(),
-    confirmation: z.string(),
-  })
-  .refine(expertiseRule.check, expertiseRule.params);
+export const resubmissionFormSchema = z.object({
+  ...detailsShape,
+  email: z.string(),
+  password: z.string(),
+  confirmation: z.string(),
+});
 
 export type MentorFormValues = z.input<typeof mentorApplicationSchema>;

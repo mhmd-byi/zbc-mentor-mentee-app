@@ -1,6 +1,3 @@
-// Add the areas here. Mentors pick them as expertise, and mentees as interests.
-export const EXPERTISE_AREAS: readonly string[] = [];
-
 export const AVAILABILITY_OPTIONS = [
   { value: "weekday-daytime", label: "Weekday daytime" },
   { value: "weekday-evening", label: "Weekday evenings" },
@@ -18,7 +15,21 @@ export function availabilityLabels(values: string[]) {
   ).map((option) => option.label);
 }
 
-// Chosen areas and typed ones, as a single line.
-export function areasText(areas: string[], other: string) {
-  return [...areas, other].filter(Boolean).join(", ");
+// "Accounting,  Digital  marketing" becomes ["Accounting", "Digital marketing"].
+function splitAreas(text: string) {
+  return text
+    .split(",")
+    .map((area) => area.trim().replace(/\s+/g, " "))
+    .filter(Boolean);
+}
+
+// The mentor's areas that the mentee typed too, ignoring capitals.
+export function sharedAreas(expertise: string, interests: string) {
+  const wanted = new Set(
+    splitAreas(interests).map((area) => area.toLowerCase()),
+  );
+  // delete() succeeds only once, so a repeated area isn't listed twice.
+  return splitAreas(expertise).filter((area) =>
+    wanted.delete(area.toLowerCase()),
+  );
 }

@@ -2,10 +2,7 @@
 
 import type { ReactTable, RowData } from "@tanstack/react-table";
 import { Input } from "@/components/ui/input";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+import { Select } from "@/components/ui/select";
 import type { Features } from "./features";
 
 type TableSearchProps<TData extends RowData> = {
@@ -48,22 +45,14 @@ export function TableFilter<TData extends RowData>({
   options,
 }: TableFilterProps<TData>) {
   return (
-    <NativeSelect
+    <Select
       aria-label={label}
-      className="w-full sm:w-fit"
+      className="w-full sm:w-auto sm:min-w-44"
+      options={[{ value: "", label: allLabel }, ...options]}
       value={String(table.getColumn(column)?.getFilterValue() ?? "")}
-      onChange={(event) =>
-        table
-          .getColumn(column)
-          ?.setFilterValue(event.target.value || undefined)
+      onValueChange={(value) =>
+        table.getColumn(column)?.setFilterValue(value || undefined)
       }
-    >
-      <NativeSelectOption value="">{allLabel}</NativeSelectOption>
-      {options.map((option) => (
-        <NativeSelectOption key={option.value} value={option.value}>
-          {option.label}
-        </NativeSelectOption>
-      ))}
-    </NativeSelect>
+    />
   );
 }

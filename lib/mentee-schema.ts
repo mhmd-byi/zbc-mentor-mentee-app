@@ -1,6 +1,5 @@
 import { z } from "zod";
 import {
-  areaRule,
   areasSchema,
   availabilitySchema,
   passwordRule,
@@ -37,8 +36,7 @@ const profileShape = {
     .trim()
     .min(1, "Enter your job or business, or that you're a student.")
     .max(150, "Use 150 characters or fewer."),
-  interests: areasSchema,
-  otherInterests: z.string().trim().max(200, "Use 200 characters or fewer."),
+  otherInterests: areasSchema("Add at least one area of interest."),
   goals: z
     .string()
     .trim()
@@ -48,12 +46,6 @@ const profileShape = {
 };
 
 export const menteeProfileSchema = z.object(profileShape);
-
-const interestRule = areaRule(
-  "interests",
-  "otherInterests",
-  "Add at least one area of interest.",
-);
 
 export const menteeSignupSchema = z
   .object({
@@ -67,7 +59,6 @@ export const menteeSignupSchema = z
     password: passwordSchema,
     confirmation: z.string(),
   })
-  .refine(interestRule.check, interestRule.params)
   .refine(passwordRule.check, passwordRule.params);
 
 export type MenteeFormValues = z.input<typeof menteeSignupSchema>;

@@ -10,12 +10,7 @@ import { FieldLegend, FieldSet } from "@/components/ui/field";
 import { FormMessage } from "@/components/ui/form-message";
 import { PendingButton } from "@/components/ui/pending-button";
 import { menteeSignupSchema, type MenteeFormValues } from "@/lib/mentee-schema";
-import { AVAILABILITY_OPTIONS, EXPERTISE_AREAS } from "@/lib/mentor-options";
-
-const INTEREST_OPTIONS = EXPERTISE_AREAS.map((area) => ({
-  value: area,
-  label: area,
-}));
+import { AVAILABILITY_OPTIONS } from "@/lib/mentor-options";
 
 const DEFAULT_VALUES: MenteeFormValues = {
   name: "",
@@ -27,7 +22,6 @@ const DEFAULT_VALUES: MenteeFormValues = {
   dateOfBirth: "",
   education: "",
   occupation: "",
-  interests: [],
   otherInterests: "",
   goals: "",
   availability: [],
@@ -104,25 +98,12 @@ export function MenteeSignupForm() {
 
         <FieldSet>
           <FieldLegend>Mentoring</FieldLegend>
-          {INTEREST_OPTIONS.length > 0 && (
-            <form.AppField name="interests">
-              {(field) => (
-                <field.CheckboxGroupField
-                  label="Areas of interest"
-                  options={INTEREST_OPTIONS}
-                />
-              )}
-            </form.AppField>
-          )}
           <form.AppField name="otherInterests">
             {(field) => (
               <field.TextField
-                label={
-                  INTEREST_OPTIONS.length
-                    ? "Other areas (optional)"
-                    : "Areas of interest"
-                }
-                description="Separate areas with commas."
+                label="Areas of interest"
+                description="Separate areas with commas, such as Accounting, Marketing."
+                maxLength={200}
               />
             )}
           </form.AppField>

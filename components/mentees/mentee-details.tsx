@@ -1,6 +1,6 @@
 import { DetailsList } from "@/components/layout/details-list";
 import type { MenteeRecord } from "@/lib/mentees";
-import { areasText, availabilityLabels } from "@/lib/mentor-options";
+import { availabilityLabels } from "@/lib/mentor-options";
 
 // Everything a mentee told us when signing up.
 export function MenteeDetails({ mentee }: { mentee: MenteeRecord }) {
@@ -15,10 +15,7 @@ export function MenteeDetails({ mentee }: { mentee: MenteeRecord }) {
         { label: "Date of birth", value: mentee.dateOfBirth },
         { label: "Education", value: mentee.education },
         { label: "Occupation", value: mentee.occupation },
-        {
-          label: "Interests",
-          value: areasText(mentee.interests, mentee.otherInterests),
-        },
+        { label: "Interests", value: mentee.otherInterests },
         {
           label: "Availability",
           value: availabilityLabels(mentee.availability).join(", "),

@@ -9,7 +9,7 @@ import {
   type UserStatus,
 } from "./db";
 import { formatDate } from "./format";
-import { areasText, availabilityLabels } from "./mentor-options";
+import { availabilityLabels, sharedAreas } from "./mentor-options";
 import type { MenteeRecord } from "./mentees";
 
 export type MentorRecord = {
@@ -25,7 +25,6 @@ export type MentorRecord = {
   occupation: string;
   company: string;
   yearsExperience: number | null;
-  expertise: string[];
   otherExpertise: string;
   availability: string[];
   bio: string;
@@ -65,7 +64,6 @@ function toRecord(
     occupation: mentor.occupation ?? "",
     company: mentor.company ?? "",
     yearsExperience: mentor.yearsExperience ?? null,
-    expertise: mentor.expertise ?? [],
     otherExpertise: mentor.otherExpertise ?? "",
     availability: mentor.availability ?? [],
     bio: mentor.bio ?? "",
@@ -123,11 +121,11 @@ export async function listMentorMatches(mentee: MenteeRecord) {
         id: mentor.id,
         name: mentor.name,
         occupation: mentor.occupation,
-        expertise: areasText(mentor.expertise, mentor.otherExpertise),
+        expertise: mentor.otherExpertise,
         activeMentees,
         maxMentees,
         shared: [
-          ...mentor.expertise.filter((area) => mentee.interests.includes(area)),
+          ...sharedAreas(mentor.otherExpertise, mentee.otherInterests),
           ...availabilityLabels(
             mentor.availability.filter((time) =>
               mentee.availability.includes(time),

@@ -1,5 +1,5 @@
 import { DetailsList } from "@/components/layout/details-list";
-import { areasText, availabilityLabels } from "@/lib/mentor-options";
+import { availabilityLabels } from "@/lib/mentor-options";
 import type { MentorRecord } from "@/lib/mentors";
 
 // Everything on a mentor's application.
@@ -18,10 +18,7 @@ export function MentorDetails({ mentor }: { mentor: MentorRecord }) {
           label: "Years of experience",
           value: mentor.yearsExperience?.toString(),
         },
-        {
-          label: "Expertise",
-          value: areasText(mentor.expertise, mentor.otherExpertise),
-        },
+        { label: "Expertise", value: mentor.otherExpertise },
         {
           label: "Availability",
           value: availabilityLabels(mentor.availability).join(", "),

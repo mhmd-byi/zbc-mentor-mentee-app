@@ -12,7 +12,6 @@ import { FormMessage } from "@/components/ui/form-message";
 import { PendingButton } from "@/components/ui/pending-button";
 import {
   AVAILABILITY_OPTIONS,
-  EXPERTISE_AREAS,
   MENTEE_LIMIT_OPTIONS,
 } from "@/lib/mentor-options";
 import {
@@ -22,11 +21,10 @@ import {
 } from "@/lib/mentor-schema";
 import type { MentorRecord } from "@/lib/mentors";
 
-const toOptions = (values: readonly string[]) =>
-  values.map((value) => ({ value, label: value }));
-
-const EXPERTISE_OPTIONS = toOptions(EXPERTISE_AREAS);
-const LIMIT_OPTIONS = toOptions(MENTEE_LIMIT_OPTIONS);
+const LIMIT_OPTIONS = MENTEE_LIMIT_OPTIONS.map((value) => ({
+  value,
+  label: value,
+}));
 
 // Pass `mentor` to correct and resend a rejected application.
 export function MentorApplicationForm({ mentor }: { mentor?: MentorRecord }) {
@@ -44,7 +42,6 @@ export function MentorApplicationForm({ mentor }: { mentor?: MentorRecord }) {
     occupation: mentor?.occupation ?? "",
     company: mentor?.company ?? "",
     yearsExperience: mentor?.yearsExperience?.toString() ?? "",
-    expertise: mentor?.expertise ?? [],
     otherExpertise: mentor?.otherExpertise ?? "",
     availability: mentor?.availability ?? [],
     bio: mentor?.bio ?? "",
@@ -111,25 +108,12 @@ export function MentorApplicationForm({ mentor }: { mentor?: MentorRecord }) {
               )}
             </form.AppField>
           </div>
-          {EXPERTISE_OPTIONS.length > 0 && (
-            <form.AppField name="expertise">
-              {(field) => (
-                <field.CheckboxGroupField
-                  label="Areas of expertise"
-                  options={EXPERTISE_OPTIONS}
-                />
-              )}
-            </form.AppField>
-          )}
           <form.AppField name="otherExpertise">
             {(field) => (
               <field.TextField
-                label={
-                  EXPERTISE_OPTIONS.length
-                    ? "Other areas (optional)"
-                    : "Areas of expertise"
-                }
-                description="Separate areas with commas."
+                label="Areas of expertise"
+                description="Separate areas with commas, such as Accounting, Marketing."
+                maxLength={200}
               />
             )}
           </form.AppField>

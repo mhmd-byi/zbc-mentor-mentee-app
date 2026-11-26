@@ -7,14 +7,10 @@ import { PersonLink } from "@/components/table/person-link";
 import { TableFilter, TableSearch } from "@/components/table/table-controls";
 import { useDataTable } from "@/components/table/use-data-table";
 import { UserStatusBadge } from "@/components/users/user-status-badge";
-import { areasText } from "@/lib/mentor-options";
 import type { MentorRecord } from "@/lib/mentors";
 import { ApplicationStatusBadge } from "./application-status-badge";
 
 const column = createColumnHelper<Features, MentorRecord>();
-
-const expertiseOf = (mentor: MentorRecord) =>
-  areasText(mentor.expertise, mentor.otherExpertise);
 
 const columns = column.columns([
   column.accessor("name", {
@@ -27,12 +23,12 @@ const columns = column.columns([
       />
     ),
   }),
-  column.accessor(expertiseOf, {
+  column.accessor("otherExpertise", {
     id: "expertise",
     header: "Expertise",
     cell: ({ row }) => (
       <span className="line-clamp-2 max-w-60 whitespace-normal">
-        {expertiseOf(row.original)}
+        {row.original.otherExpertise}
       </span>
     ),
   }),
@@ -73,7 +69,7 @@ export function MentorsTable({ mentors }: { mentors: MentorRecord[] }) {
       mentor.name,
       mentor.email,
       mentor.occupation,
-      expertiseOf(mentor),
+      mentor.otherExpertise,
     ],
   });
 

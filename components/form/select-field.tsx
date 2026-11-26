@@ -2,16 +2,13 @@
 
 import { useId } from "react";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import {
-  NativeSelect,
-  NativeSelectOption,
-} from "@/components/ui/native-select";
+import { Select, type SelectOption } from "@/components/ui/select";
 import { useFieldContext } from "./form-context";
 
 type SelectFieldProps = {
   label: string;
   placeholder: string;
-  options: { value: string; label: string }[];
+  options: SelectOption[];
   disabled?: boolean;
 };
 
@@ -31,24 +28,28 @@ export function SelectField({
   return (
     <Field data-invalid={invalid}>
       <FieldLabel htmlFor={id}>{label}</FieldLabel>
-      <NativeSelect
+      <Select
         id={id}
         name={field.name}
         className="w-full"
+        placeholder={placeholder}
+        options={options}
         disabled={disabled}
         value={field.state.value}
-        onChange={(event) => field.handleChange(event.target.value)}
-        onBlur={field.handleBlur}
+        onValueChange={field.handleChange}
+        // The field is left when its menu closes, or on tabbing past it. Focus
+        // moving into an open menu doesn't count.
+        onOpenChange={(open) => {
+          if (!open) field.handleBlur();
+        }}
+        onBlur={(event) => {
+          if (event.currentTarget.getAttribute("aria-expanded") !== "true") {
+            field.handleBlur();
+          }
+        }}
         aria-invalid={invalid || undefined}
         aria-describedby={invalid ? errorId : undefined}
-      >
-        <NativeSelectOption value="">{placeholder}</NativeSelectOption>
-        {options.map((option) => (
-          <NativeSelectOption key={option.value} value={option.value}>
-            {option.label}
-          </NativeSelectOption>
-        ))}
-      </NativeSelect>
+      />
       <FieldError id={errorId} errors={errors} />
     </Field>
   );

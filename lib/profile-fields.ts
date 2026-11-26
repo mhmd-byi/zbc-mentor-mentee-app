@@ -1,10 +1,15 @@
 // Rules shared by the mentor and mentee sign-up forms.
 import { z } from "zod";
-import { AVAILABILITY_OPTIONS, EXPERTISE_AREAS } from "./mentor-options";
+import { AVAILABILITY_OPTIONS } from "./mentor-options";
 
-export const areasSchema = z.array(
-  z.string().refine((value) => EXPERTISE_AREAS.includes(value)),
-);
+// Expertise or interests, typed freely. Matching compares the entries between commas.
+export function areasSchema(message: string) {
+  return z
+    .string()
+    .trim()
+    .min(1, message)
+    .max(200, "Use 200 characters or fewer.");
+}
 
 export const availabilitySchema = z
   .array(
@@ -16,23 +21,7 @@ export const availabilitySchema = z
   )
   .min(1, "Choose at least one time.");
 
-// The rules below compare fields, and `when` makes them run alongside other errors.
-
-// Needs a choice from the list, or something typed in the "other" box.
-export function areaRule(listKey: string, otherKey: string, message: string) {
-  return {
-    check(values: unknown) {
-      const record = (values ?? {}) as Record<string, unknown>;
-      const list = record[listKey];
-      return (
-        (Array.isArray(list) && list.length > 0) ||
-        String(record[otherKey] ?? "").trim() !== ""
-      );
-    },
-    params: { path: [otherKey], message, when: () => true },
-  };
-}
-
+// This rule compares fields, and `when` makes it run alongside other errors.
 export const passwordRule = {
   check(values: unknown) {
     const { password, confirmation } = (values ?? {}) as {

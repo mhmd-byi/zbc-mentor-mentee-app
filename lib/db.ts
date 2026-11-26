@@ -18,7 +18,8 @@ export type MentorProfile = {
   occupation?: string;
   company?: string;
   yearsExperience?: number;
-  expertise?: string[];
+  // Free text, comma separated. "other" is left from when there was also a list;
+  // renaming it, or otherInterests below, would mean migrating saved accounts.
   otherExpertise?: string;
   availability?: string[];
   bio?: string;
@@ -34,7 +35,6 @@ export type MenteeProfile = {
   dateOfBirth: string; // YYYY-MM-DD
   education: string;
   occupation: string;
-  interests: string[];
   otherInterests: string;
   goals: string;
   availability: string[];
