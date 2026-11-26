@@ -12,6 +12,30 @@ export function appUrl() {
     : null;
 }
 
+// Names and messages are typed by users, so they must not be read as HTML.
+function escapeHtml(text: string) {
+  return text.replace(
+    /[&<>"']/g,
+    (character) => `&#${character.charCodeAt(0)};`,
+  );
+}
+
+// A short message to one person, ending with a link to sign in.
+export function sendNotice(to: string, subject: string, lines: string[]) {
+  const base = appUrl();
+  const link = base ? `${base}/login` : "";
+  const paragraphs = lines
+    .map((line) => `<p style="white-space:pre-line">${escapeHtml(line)}</p>`)
+    .join("");
+
+  return sendEmail({
+    to,
+    subject: `${subject} (ZBC Mentorship)`,
+    text: `${lines.join("\n")}\n\n${link}`,
+    html: `${paragraphs}${link && `<p><a href="${link}">Sign in</a></p>`}`,
+  });
+}
+
 // Sends through Resend. Returns false if the email couldn't be sent.
 export async function sendEmail(email: Email) {
   const apiKey = process.env.RESEND_API_KEY;

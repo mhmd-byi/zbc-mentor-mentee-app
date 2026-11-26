@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Dashboard } from "@/components/dashboard/dashboard";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { MyMeetings } from "@/components/meetings/my-meetings";
 import { MentorApplicationForm } from "@/components/mentors/mentor-application-form";
 import { MentorDetails } from "@/components/mentors/mentor-details";
 import { ContactCard } from "@/components/pairings/contact-card";
@@ -91,6 +92,7 @@ async function Mentees({ limit }: { limit: number | null }) {
 
   return (
     <>
+      <MyMeetings partners={mentees} />
       <h2 className="text-lg font-semibold tracking-[-0.01em]">
         Your mentees ({mentees.length}
         {limit !== null && ` of ${limit}`})

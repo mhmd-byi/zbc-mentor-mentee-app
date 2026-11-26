@@ -84,6 +84,25 @@ export type PairingDocument = {
   note?: string;
 };
 
+// A meeting within a pairing. One person proposes it and the other answers.
+export type MeetingDocument = {
+  pairingId: ObjectId;
+  mentorId: ObjectId;
+  menteeId: ObjectId;
+  startsAt: Date;
+  // A place to meet, or a link to join.
+  location: string;
+  note: string;
+  status: "proposed" | "confirmed" | "declined" | "cancelled";
+  proposedBy: ObjectId;
+  proposedAt: Date;
+  // Who last answered or cancelled it, and when.
+  updatedBy?: ObjectId;
+  updatedAt?: Date;
+  // Why it was declined or cancelled.
+  reason?: string;
+};
+
 // Reused across requests (and dev reloads) so each one doesn't open a new connection.
 const globalForMongo = globalThis as typeof globalThis & {
   mongoClient?: MongoClient;
@@ -103,6 +122,17 @@ export function getUsers() {
 
 export function getPairings() {
   return getClient().db().collection<PairingDocument>("pairings");
+}
+
+export function getMeetings() {
+  return getClient().db().collection<MeetingDocument>("meetings");
+}
+
+export function ensureMeetingIndexes() {
+  return getMeetings().createIndexes([
+    { key: { pairingId: 1, startsAt: -1 } },
+    { key: { menteeId: 1, startsAt: -1 } },
+  ]);
 }
 
 // Runs the work atomically, retrying if another change collides with it.

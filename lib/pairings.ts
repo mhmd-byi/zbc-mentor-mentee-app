@@ -22,6 +22,7 @@ const CONTACT_FIELDS = {
 
 export type Partner = {
   id: string;
+  pairingId: string;
   name: string;
   email: string;
   phone: string;
@@ -44,16 +45,20 @@ export type PairingRecord = {
   note: string;
 };
 
-function toPartner(user: WithId<UserDocument>, since: Date): Partner {
+function toPartner(
+  user: WithId<UserDocument>,
+  pairing: WithId<PairingDocument>,
+): Partner {
   return {
     id: user._id.toString(),
+    pairingId: pairing._id.toString(),
     name: user.name,
     email: user.email,
     phone: user.phone ?? "",
     city: user.city ?? "",
     mohalla: user.mohalla ?? "",
     itsId: user.itsId ?? "",
-    since: formatDate(since),
+    since: formatDate(pairing.startedAt),
   };
 }
 
@@ -75,7 +80,7 @@ async function activePartners(
 
   return pairings.flatMap((pairing) => {
     const user = users.find(({ _id }) => _id.equals(pairing[partnerKey]));
-    return user ? [toPartner(user, pairing.startedAt)] : [];
+    return user ? [toPartner(user, pairing)] : [];
   });
 }
 

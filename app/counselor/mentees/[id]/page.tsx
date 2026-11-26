@@ -6,6 +6,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { BackLink } from "@/components/layout/back-link";
 import { Loading } from "@/components/layout/loading";
 import { PageHeader } from "@/components/layout/page-header";
+import { MeetingRecords } from "@/components/meetings/meeting-records";
 import { MenteeDetails } from "@/components/mentees/mentee-details";
 import { AssignMentorList } from "@/components/pairings/assign-mentor-list";
 import { EndPairingForm } from "@/components/pairings/end-pairing-form";
@@ -20,6 +21,7 @@ import {
 } from "@/components/ui/card";
 import { FormMessage } from "@/components/ui/form-message";
 import { requireRole } from "@/lib/auth";
+import { listMenteeMeetings } from "@/lib/meetings";
 import { getMentee, type MenteeRecord } from "@/lib/mentees";
 import { listMentorMatches } from "@/lib/mentors";
 import { listPairings } from "@/lib/pairings";
@@ -61,7 +63,10 @@ async function Mentee({ params, searchParams }: Props) {
   const mentee = await getMentee(id);
   if (!mentee) notFound();
 
-  const pairings = await listPairings({ menteeId: id });
+  const [pairings, meetings] = await Promise.all([
+    listPairings({ menteeId: id }),
+    listMenteeMeetings(id),
+  ]);
   const current = pairings.find((pairing) => pairing.state === "active");
   const canBePaired =
     mentee.accountStatus === "active" && mentee.emailVerified;
@@ -104,6 +109,9 @@ async function Mentee({ params, searchParams }: Props) {
         </Card>
       )}
       {!current && canBePaired && <AssignMentor mentee={mentee} />}
+      {(current || meetings.length > 0) && (
+        <MeetingRecords meetings={meetings} />
+      )}
 
       <Card>
         <CardHeader>

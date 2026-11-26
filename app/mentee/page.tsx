@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ResendVerificationButton } from "@/components/auth/resend-verification-button";
 import { Dashboard } from "@/components/dashboard/dashboard";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { MyMeetings } from "@/components/meetings/my-meetings";
 import { ContactCard } from "@/components/pairings/contact-card";
 import {
   Card,
@@ -56,6 +57,7 @@ async function MenteeHome() {
   if (mentor) {
     return (
       <>
+        <MyMeetings partners={[mentor]} />
         <h2 className="text-lg font-semibold tracking-[-0.01em]">
           Your mentor
         </h2>
