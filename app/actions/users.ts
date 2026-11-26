@@ -1,10 +1,15 @@
 "use server";
 
-import { MongoServerError, ObjectId } from "mongodb";
+import { ObjectId } from "mongodb";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth";
-import { ensureUserIndexes, getUsers, type UserDocument } from "@/lib/db";
+import {
+  duplicateKeyMessage,
+  ensureUserIndexes,
+  getUsers,
+  type UserDocument,
+} from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { passwordSchema, type FormState } from "@/lib/schemas";
 import {
@@ -14,14 +19,6 @@ import {
 } from "@/lib/user-schema";
 
 const NOT_FOUND = "That account no longer exists.";
-
-function duplicateKeyMessage(error: unknown) {
-  // 11000 is MongoDB's duplicate key error. Anything else is unexpected.
-  if (!(error instanceof MongoServerError) || error.code !== 11000) throw error;
-  return error.keyPattern?.itsId
-    ? "That ITS ID belongs to another account."
-    : "An account with that email already exists.";
-}
 
 async function updateById(id: string, changes: Partial<UserDocument>) {
   if (!ObjectId.isValid(id)) return false;

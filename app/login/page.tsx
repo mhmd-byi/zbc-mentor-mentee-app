@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import Link from "next/link";
 import { Suspense } from "react";
 import { LoginForm } from "@/components/auth/login-form";
+import { RedirectIfSignedIn } from "@/components/auth/redirect-if-signed-in";
 import { CenteredCard } from "@/components/layout/centered-card";
-import { getCurrentUser } from "@/lib/auth";
-import { DASHBOARD_PATHS } from "@/lib/roles";
+import { buttonVariants } from "@/components/ui/button";
 
 export const metadata: Metadata = { title: "Sign in" };
 
@@ -14,9 +14,17 @@ export default function LoginPage() {
       title="Sign in"
       description="to ZBC Mentorship"
       footer={
-        <p className="text-center text-sm text-muted-foreground">
-          Can&apos;t sign in? Contact your administrator.
-        </p>
+        <div className="flex flex-col items-center gap-4">
+          <Link
+            href="/become-a-mentor"
+            className={buttonVariants({ variant: "secondary" })}
+          >
+            Become a mentor
+          </Link>
+          <p className="text-center text-sm text-muted-foreground">
+            Can&apos;t sign in? Contact your administrator.
+          </p>
+        </div>
       }
     >
       <Suspense fallback={null}>
@@ -25,10 +33,4 @@ export default function LoginPage() {
       <LoginForm />
     </CenteredCard>
   );
-}
-
-async function RedirectIfSignedIn() {
-  const user = await getCurrentUser();
-  if (user) redirect(DASHBOARD_PATHS[user.role]);
-  return null;
 }

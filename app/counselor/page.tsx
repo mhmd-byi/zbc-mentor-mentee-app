@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Dashboard } from "@/components/dashboard/dashboard";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { MentorsTable } from "@/components/mentors/mentors-table";
+import { listMentors } from "@/lib/mentors";
 
 export const metadata: Metadata = { title: "Counselor" };
 
@@ -9,12 +11,23 @@ export default function CounselorPage() {
     <Dashboard
       area="counselor"
       allowedRoles={["counselor", "admin"]}
-      description="Approve mentors and pair them with mentees."
+      description="Review mentor applications and manage mentors."
     >
-      <EmptyState
-        title="Nothing to review"
-        description="Mentor applications and pairings will appear here."
-      />
+      <Mentors />
     </Dashboard>
   );
+}
+
+async function Mentors() {
+  const mentors = await listMentors();
+
+  if (mentors.length === 0) {
+    return (
+      <EmptyState
+        title="No mentors yet"
+        description="Mentor applications will appear here."
+      />
+    );
+  }
+  return <MentorsTable mentors={mentors} />;
 }

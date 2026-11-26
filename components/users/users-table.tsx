@@ -13,7 +13,7 @@ import {
 } from "@tanstack/react-table";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -28,6 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { TablePagination } from "@/components/ui/table-pagination";
 import { ROLE_LABELS, ROLES } from "@/lib/roles";
 import type { UserRecord } from "@/lib/users";
 import { UserStatusBadge } from "./user-status-badge";
@@ -193,31 +194,16 @@ export function UsersTable({ users }: { users: UserRecord[] }) {
         )}
       </Card>
 
-      <div className="flex items-center justify-between gap-4">
-        <p className="text-sm text-muted-foreground" aria-live="polite">
-          {matches} {matches === 1 ? "person" : "people"}
-          {pageCount > 1 &&
-            `, page ${table.state.pagination.pageIndex + 1} of ${pageCount}`}
-        </p>
-        {pageCount > 1 && (
-          <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              disabled={!table.getCanPreviousPage()}
-              onClick={() => table.previousPage()}
-            >
-              Previous
-            </Button>
-            <Button
-              variant="secondary"
-              disabled={!table.getCanNextPage()}
-              onClick={() => table.nextPage()}
-            >
-              Next
-            </Button>
-          </div>
-        )}
-      </div>
+      <TablePagination
+        count={matches}
+        noun={["person", "people"]}
+        pageIndex={table.state.pagination.pageIndex}
+        pageCount={pageCount}
+        hasPrevious={table.getCanPreviousPage()}
+        hasNext={table.getCanNextPage()}
+        onPrevious={() => table.previousPage()}
+        onNext={() => table.nextPage()}
+      />
     </div>
   );
 }

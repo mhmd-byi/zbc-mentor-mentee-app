@@ -12,9 +12,14 @@ export function Form({ children }: { children: ReactNode }) {
     <form
       method="post"
       noValidate
-      onSubmit={(event) => {
+      onSubmit={async (event) => {
         event.preventDefault();
-        form.handleSubmit();
+        const element = event.currentTarget;
+        await form.handleSubmit();
+        // Once any errors have rendered, take the person to the first one.
+        requestAnimationFrame(() =>
+          element.querySelector<HTMLElement>('[aria-invalid="true"]')?.focus(),
+        );
       }}
     >
       <FieldGroup>{children}</FieldGroup>
