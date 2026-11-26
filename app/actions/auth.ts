@@ -1,18 +1,24 @@
 "use server";
 
+import { ObjectId } from "mongodb";
 import { redirect } from "next/navigation";
+import { requireUser } from "@/lib/auth";
 import { getUsers } from "@/lib/db";
-import { verifyPassword } from "@/lib/password";
+import { hashPassword, verifyPassword } from "@/lib/password";
 import { DASHBOARD_PATHS } from "@/lib/roles";
-import { loginSchema, type LoginValues } from "@/lib/schemas";
+import {
+  loginSchema,
+  newPasswordSchema,
+  type FormState,
+  type LoginValues,
+  type NewPasswordValues,
+} from "@/lib/schemas";
 import { createSession, deleteSession } from "@/lib/session";
 
-export type LoginState = { error?: string };
-
 export async function login(
-  _state: LoginState,
+  _state: FormState,
   values: LoginValues,
-): Promise<LoginState> {
+): Promise<FormState> {
   const parsed = loginSchema.safeParse(values);
   if (!parsed.success) return { error: "Enter your email and password." };
 
@@ -31,6 +37,42 @@ export async function login(
   }
 
   await createSession(user._id.toString());
+  redirect(
+    user.mustChangePassword ? "/change-password" : DASHBOARD_PATHS[user.role],
+  );
+}
+
+export async function changePassword(
+  _state: FormState,
+  values: NewPasswordValues,
+): Promise<FormState> {
+  const user = await requireUser();
+  // Only for replacing a temporary password, since it doesn't ask for the old one.
+  if (!user.mustChangePassword) redirect(DASHBOARD_PATHS[user.role]);
+
+  const parsed = newPasswordSchema.safeParse(values);
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+
+  const _id = new ObjectId(user.id);
+  const current = await getUsers().findOne(
+    { _id },
+    { projection: { passwordHash: 1 } },
+  );
+  if (await verifyPassword(parsed.data.password, current?.passwordHash)) {
+    return { error: "Choose a password that differs from the temporary one." };
+  }
+
+  await getUsers().updateOne(
+    { _id },
+    {
+      $set: {
+        passwordHash: await hashPassword(parsed.data.password),
+        mustChangePassword: false,
+        passwordChangedAt: new Date(),
+      },
+    },
+  );
+  await createSession(user.id);
   redirect(DASHBOARD_PATHS[user.role]);
 }
 

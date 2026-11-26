@@ -30,14 +30,16 @@ export async function createSession(userId: string) {
   });
 }
 
-export async function readSessionUserId() {
+export async function readSession() {
   const token = (await cookies()).get(COOKIE_NAME)?.value;
   if (!token) return null;
 
   const key = getKey();
   try {
     const { payload } = await jwtVerify(token, key, { algorithms: ["HS256"] });
-    return payload.sub ?? null;
+    return payload.sub && payload.iat
+      ? { userId: payload.sub, issuedAt: payload.iat }
+      : null;
   } catch {
     // Expired or tampered with: treat as signed out.
     return null;

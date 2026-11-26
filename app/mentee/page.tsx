@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Dashboard } from "@/components/dashboard/dashboard";
+import { EmptyState } from "@/components/dashboard/empty-state";
 
 export const metadata: Metadata = { title: "Mentee" };
 
@@ -9,8 +10,11 @@ export default function MenteePage() {
       area="mentee"
       allowedRoles={["mentee"]}
       description="The person guiding you."
-      emptyTitle="No mentor yet"
-      emptyMessage="Your mentor will appear here once a counselor assigns one."
-    />
+    >
+      <EmptyState
+        title="No mentor yet"
+        description="Your mentor will appear here once a counselor assigns one."
+      />
+    </Dashboard>
   );
 }

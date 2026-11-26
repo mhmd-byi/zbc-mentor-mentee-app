@@ -4,7 +4,7 @@ import { revalidateLogic } from "@tanstack/react-form";
 import { startTransition, useActionState, useLayoutEffect } from "react";
 import { login } from "@/app/actions/auth";
 import { useAppForm } from "@/components/form/use-app-form";
-import { FieldError } from "@/components/ui/field";
+import { FormMessage } from "@/components/ui/form-message";
 import { PendingButton } from "@/components/ui/pending-button";
 import { loginSchema } from "@/lib/schemas";
 
@@ -43,11 +43,7 @@ export function LoginForm() {
             />
           )}
         </form.AppField>
-        {!isPending && (
-          <FieldError className="rounded-xl bg-destructive/10 px-4 py-3 text-center font-medium">
-            {state.error}
-          </FieldError>
-        )}
+        {!isPending && <FormMessage {...state} />}
         <PendingButton
           type="submit"
           size="lg"
