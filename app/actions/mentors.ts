@@ -7,7 +7,9 @@ import { getCurrentUser, requireRole } from "@/lib/auth";
 import {
   duplicateKeyMessage,
   ensureUserIndexes,
+  getPairings,
   getUsers,
+  inTransaction,
   type UserDocument,
 } from "@/lib/db";
 import {
@@ -183,11 +185,35 @@ export async function setMaxMentees(
   const parsed = maxMenteesSchema.safeParse(values.maxMentees);
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
-  const updated = await updateMentor(
-    mentorId,
-    // Approved mentors, including those an admin created.
-    { "mentor.applicationStatus": { $nin: ["pending", "rejected"] } },
-    { $set: { "mentor.maxMentees": parsed.data } },
-  );
-  return updated ? { success: "Mentee limit saved." } : { error: OUT_OF_DATE };
+  if (!ObjectId.isValid(mentorId)) return { error: OUT_OF_DATE };
+  const _id = new ObjectId(mentorId);
+
+  // In a transaction, so a pairing made at the same moment can't slip past.
+  const result = await inTransaction<FormState>(async (session) => {
+    const active = await getPairings().countDocuments(
+      { mentorId: _id, status: "active" },
+      { session },
+    );
+    if (parsed.data < active) {
+      return {
+        error: `They have ${active} mentees. End a pairing before lowering the limit below that.`,
+      };
+    }
+    const update = await getUsers().updateOne(
+      {
+        _id,
+        role: "mentor",
+        // Approved mentors, including those an admin created.
+        "mentor.applicationStatus": { $nin: ["pending", "rejected"] },
+      },
+      { $set: { "mentor.maxMentees": parsed.data } },
+      { session },
+    );
+    return update.matchedCount
+      ? { success: "Mentee limit saved." }
+      : { error: OUT_OF_DATE };
+  });
+
+  revalidatePath("/counselor", "layout");
+  return result;
 }

@@ -1,40 +1,34 @@
-import { AVAILABILITY_OPTIONS } from "@/lib/mentor-options";
+import { DetailsList } from "@/components/layout/details-list";
+import { areasText, availabilityLabels } from "@/lib/mentor-options";
 import type { MentorRecord } from "@/lib/mentors";
 
-// Everything on a mentor's application, read-only.
+// Everything on a mentor's application.
 export function MentorDetails({ mentor }: { mentor: MentorRecord }) {
-  const availability = AVAILABILITY_OPTIONS.filter((option) =>
-    mentor.availability.includes(option.value),
-  ).map((option) => option.label);
-
-  const rows = [
-    ["Email", mentor.email],
-    ["Phone", mentor.phone],
-    ["ITS ID", mentor.itsId],
-    ["City or area", mentor.city],
-    ["Mohalla", mentor.mohalla],
-    ["Occupation", mentor.occupation],
-    ["Company or business", mentor.company],
-    ["Years of experience", mentor.yearsExperience?.toString()],
-    [
-      "Expertise",
-      [...mentor.expertise, mentor.otherExpertise].filter(Boolean).join(", "),
-    ],
-    ["Availability", availability.join(", ")],
-    ["Maximum mentees", mentor.maxMentees?.toString()],
-    ["About", mentor.bio],
-  ];
-
   return (
-    <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">
-      {rows.map(([label, value]) => (
-        <div key={label} className={label === "About" ? "sm:col-span-2" : ""}>
-          <dt className="text-sm text-muted-foreground">{label}</dt>
-          <dd className="break-words whitespace-pre-line">
-            {value || "Not provided"}
-          </dd>
-        </div>
-      ))}
-    </dl>
+    <DetailsList
+      details={[
+        { label: "Email", value: mentor.email },
+        { label: "Phone", value: mentor.phone },
+        { label: "ITS ID", value: mentor.itsId },
+        { label: "City or area", value: mentor.city },
+        { label: "Mohalla", value: mentor.mohalla },
+        { label: "Occupation", value: mentor.occupation },
+        { label: "Company or business", value: mentor.company },
+        {
+          label: "Years of experience",
+          value: mentor.yearsExperience?.toString(),
+        },
+        {
+          label: "Expertise",
+          value: areasText(mentor.expertise, mentor.otherExpertise),
+        },
+        {
+          label: "Availability",
+          value: availabilityLabels(mentor.availability).join(", "),
+        },
+        { label: "Maximum mentees", value: mentor.maxMentees?.toString() },
+        { label: "About", value: mentor.bio, wide: true },
+      ]}
+    />
   );
 }

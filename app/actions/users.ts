@@ -8,8 +8,11 @@ import {
   duplicateKeyMessage,
   ensureUserIndexes,
   getUsers,
+  inTransaction,
   type UserDocument,
 } from "@/lib/db";
+import { notifyPairings } from "@/lib/pairing-emails";
+import { endActivePairings, type PairingIds } from "@/lib/pairing-service";
 import { hashPassword } from "@/lib/password";
 import { passwordSchema, type FormState } from "@/lib/schemas";
 import {
@@ -27,6 +30,18 @@ async function updateById(id: string, changes: Partial<UserDocument>) {
     { $set: changes },
   );
   return result.matchedCount === 1;
+}
+
+// Emails the people whose pairings a change ended, and words it for the admin.
+async function announceEnded(ended: PairingIds[]) {
+  if (ended.length === 0) return "";
+  const emailed = await notifyPairings("ended", ended);
+  const count =
+    ended.length === 1 ? "1 pairing was" : `${ended.length} pairings were`;
+  const warning = emailed
+    ? ""
+    : " An email couldn't be sent, so please tell them yourself.";
+  return ` ${count} ended.${warning}`;
 }
 
 export async function createUser(
@@ -68,15 +83,36 @@ export async function updateUser(
     return { error: "You can't change your own role." };
   }
 
+  if (!ObjectId.isValid(userId)) return { error: NOT_FOUND };
+  const _id = new ObjectId(userId);
+
+  let ended: PairingIds[] | null;
   try {
     await ensureUserIndexes();
-    if (!(await updateById(userId, parsed.data))) return { error: NOT_FOUND };
+    ended = await inTransaction(async (session) => {
+      const before = await getUsers().findOneAndUpdate(
+        { _id },
+        { $set: parsed.data },
+        { session, projection: { role: 1 } },
+      );
+      if (!before) return null;
+      // A pairing doesn't survive its mentor or mentee changing role.
+      if (before.role === parsed.data.role) return [];
+      return endActivePairings(
+        _id,
+        "An admin changed their role.",
+        admin.id,
+        session,
+      );
+    });
   } catch (error) {
     return { error: duplicateKeyMessage(error) };
   }
+  if (!ended) return { error: NOT_FOUND };
 
+  const announcement = await announceEnded(ended);
   revalidatePath("/admin", "layout");
-  return { success: "Changes saved." };
+  return { success: `Changes saved.${announcement}` };
 }
 
 export async function setTemporaryPassword(
@@ -116,8 +152,27 @@ export async function setUserStatus(
   if (status !== "active" && status !== "deactivated") {
     return { error: "Unknown account status." };
   }
-  if (!(await updateById(userId, { status }))) return { error: NOT_FOUND };
+  if (!ObjectId.isValid(userId)) return { error: NOT_FOUND };
+  const _id = new ObjectId(userId);
 
+  const ended = await inTransaction(async (session) => {
+    const result = await getUsers().updateOne(
+      { _id },
+      { $set: { status } },
+      { session },
+    );
+    if (!result.matchedCount) return null;
+    if (status === "active") return [];
+    return endActivePairings(
+      _id,
+      "An admin deactivated their account.",
+      admin.id,
+      session,
+    );
+  });
+  if (!ended) return { error: NOT_FOUND };
+
+  const announcement = await announceEnded(ended);
   revalidatePath("/admin", "layout");
-  return {};
+  return announcement ? { success: announcement.trim() } : {};
 }

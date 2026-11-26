@@ -2,22 +2,13 @@ import "server-only";
 import type { ObjectId } from "mongodb";
 import { createHash, randomBytes } from "node:crypto";
 import { getUsers } from "./db";
-import { sendEmail } from "./email";
+import { appUrl, sendEmail } from "./email";
 
 const LINK_LIFETIME_MS = 24 * 60 * 60 * 1000;
 
 // Only the hash is stored, so reading the database doesn't give anyone a usable link.
 function hashToken(token: string) {
   return createHash("sha256").update(token).digest("hex");
-}
-
-// Never taken from the request, which could be forged to point the link elsewhere.
-function appUrl() {
-  const url = process.env.APP_URL;
-  if (url) return url.replace(/\/+$/, "");
-  return process.env.NODE_ENV === "development"
-    ? "http://localhost:3000"
-    : null;
 }
 
 // Emails a fresh link, which replaces any earlier one.

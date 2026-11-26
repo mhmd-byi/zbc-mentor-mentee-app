@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ResendVerificationButton } from "@/components/auth/resend-verification-button";
 import { Dashboard } from "@/components/dashboard/dashboard";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { ContactCard } from "@/components/pairings/contact-card";
 import {
   Card,
   CardContent,
@@ -11,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getOwnEmailStatus } from "@/lib/mentees";
+import { getMyMentor } from "@/lib/pairings";
 
 export const metadata: Metadata = { title: "Mentee" };
 
@@ -47,6 +49,18 @@ async function MenteeHome() {
           <ResendVerificationButton />
         </CardContent>
       </Card>
+    );
+  }
+
+  const mentor = await getMyMentor();
+  if (mentor) {
+    return (
+      <>
+        <h2 className="text-lg font-semibold tracking-[-0.01em]">
+          Your mentor
+        </h2>
+        <ContactCard partner={mentor} />
+      </>
     );
   }
 

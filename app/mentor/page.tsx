@@ -4,6 +4,7 @@ import { Dashboard } from "@/components/dashboard/dashboard";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { MentorApplicationForm } from "@/components/mentors/mentor-application-form";
 import { MentorDetails } from "@/components/mentors/mentor-details";
+import { ContactCard } from "@/components/pairings/contact-card";
 import {
   Card,
   CardContent,
@@ -12,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { getOwnMentor } from "@/lib/mentors";
+import { listMyMentees } from "@/lib/pairings";
 
 export const metadata: Metadata = { title: "Mentor" };
 
@@ -72,10 +74,30 @@ async function MentorHome() {
     );
   }
 
+  return <Mentees limit={mentor.maxMentees} />;
+}
+
+async function Mentees({ limit }: { limit: number | null }) {
+  const mentees = await listMyMentees();
+
+  if (mentees.length === 0) {
+    return (
+      <EmptyState
+        title="No mentees yet"
+        description="Your mentees will appear here once a counselor assigns them."
+      />
+    );
+  }
+
   return (
-    <EmptyState
-      title="No mentees yet"
-      description="Your mentees will appear here once a counselor assigns them."
-    />
+    <>
+      <h2 className="text-lg font-semibold tracking-[-0.01em]">
+        Your mentees ({mentees.length}
+        {limit !== null && ` of ${limit}`})
+      </h2>
+      {mentees.map((mentee) => (
+        <ContactCard key={mentee.id} partner={mentee} />
+      ))}
+    </>
   );
 }

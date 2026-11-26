@@ -44,6 +44,7 @@ async function EditUser({
   const user = await getUser(id);
   if (!user) notFound();
   const isSelf = user.id === admin.id;
+  const canBePaired = user.role === "mentor" || user.role === "mentee";
 
   return (
     <>
@@ -54,6 +55,11 @@ async function EditUser({
           {isSelf && (
             <CardDescription>
               This is your account, so its role and status are locked.
+            </CardDescription>
+          )}
+          {canBePaired && (
+            <CardDescription>
+              Changing their role ends any active pairing and emails both people.
             </CardDescription>
           )}
         </CardHeader>
@@ -82,6 +88,8 @@ async function EditUser({
               </CardTitle>
               <CardDescription>
                 A deactivated person can&apos;t sign in. Their records are kept.
+                {canBePaired &&
+                  " Deactivating also ends any active pairing and emails both people."}
               </CardDescription>
             </CardHeader>
             <CardContent>

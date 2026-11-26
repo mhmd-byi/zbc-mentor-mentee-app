@@ -11,3 +11,14 @@ export const AVAILABILITY_OPTIONS = [
 export const MENTEE_LIMIT_OPTIONS = Array.from({ length: 10 }, (_, index) =>
   String(index + 1),
 );
+
+export function availabilityLabels(values: string[]) {
+  return AVAILABILITY_OPTIONS.filter((option) =>
+    values.includes(option.value),
+  ).map((option) => option.label);
+}
+
+// Chosen areas and typed ones, as a single line.
+export function areasText(areas: string[], other: string) {
+  return [...areas, other].filter(Boolean).join(", ");
+}
