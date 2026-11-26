@@ -15,12 +15,20 @@ export default function LoginPage() {
       description="to ZBC Mentorship"
       footer={
         <div className="flex flex-col items-center gap-4">
-          <Link
-            href="/become-a-mentor"
-            className={buttonVariants({ variant: "secondary" })}
-          >
-            Become a mentor
-          </Link>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link
+              href="/join-as-mentee"
+              className={buttonVariants({ variant: "secondary" })}
+            >
+              Join as a mentee
+            </Link>
+            <Link
+              href="/become-a-mentor"
+              className={buttonVariants({ variant: "secondary" })}
+            >
+              Become a mentor
+            </Link>
+          </div>
           <p className="text-center text-sm text-muted-foreground">
             Can&apos;t sign in? Contact your administrator.
           </p>

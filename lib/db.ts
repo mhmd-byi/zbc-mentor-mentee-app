@@ -23,6 +23,25 @@ export type MentorProfile = {
   reviewedBy?: string;
 };
 
+// A mentee created by an admin has none of this.
+export type MenteeProfile = {
+  dateOfBirth: string; // YYYY-MM-DD
+  education: string;
+  occupation: string;
+  interests: string[];
+  otherInterests: string;
+  goals: string;
+  availability: string[];
+};
+
+export type EmailVerification = {
+  tokenHash: string;
+  // Where the link went, so it can't verify an address changed afterwards.
+  email: string;
+  sentAt: Date;
+  expiresAt: Date;
+};
+
 export type UserDocument = {
   name: string;
   email: string;
@@ -38,6 +57,10 @@ export type UserDocument = {
   mustChangePassword?: boolean;
   passwordChangedAt?: Date;
   mentor?: MentorProfile;
+  mentee?: MenteeProfile;
+  // false only while a self-registered mentee hasn't confirmed their address.
+  emailVerified?: boolean;
+  emailVerification?: EmailVerification;
 };
 
 // Reused across requests (and dev reloads) so each one doesn't open a new connection.

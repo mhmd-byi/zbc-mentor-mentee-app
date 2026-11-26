@@ -7,7 +7,8 @@ import { TextField } from "./text-field";
 import { TextareaField } from "./textarea-field";
 
 // Use this for every form. Register new field types here.
-export const { useAppForm } = createFormHook({
+// withFieldGroup makes a set of fields that several forms can share.
+export const { useAppForm, withFieldGroup } = createFormHook({
   fieldContext,
   formContext,
   fieldComponents: {

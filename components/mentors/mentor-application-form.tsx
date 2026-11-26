@@ -5,6 +5,8 @@ import { startTransition, useActionState, useLayoutEffect } from "react";
 import type { ZodType } from "zod";
 import { applyAsMentor, resubmitApplication } from "@/app/actions/mentors";
 import { useAppForm } from "@/components/form/use-app-form";
+import { PasswordFields } from "@/components/signup/password-fields";
+import { PersonalFields } from "@/components/signup/personal-fields";
 import { FieldLegend, FieldSet } from "@/components/ui/field";
 import { FormMessage } from "@/components/ui/form-message";
 import { PendingButton } from "@/components/ui/pending-button";
@@ -19,13 +21,11 @@ import {
   type MentorFormValues,
 } from "@/lib/mentor-schema";
 import type { MentorRecord } from "@/lib/mentors";
-import { MOHALLAS } from "@/lib/mohallas";
 
 const toOptions = (values: readonly string[]) =>
   values.map((value) => ({ value, label: value }));
 
 const EXPERTISE_OPTIONS = toOptions(EXPERTISE_AREAS);
-const MOHALLA_OPTIONS = toOptions(MOHALLAS);
 const LIMIT_OPTIONS = toOptions(MENTEE_LIMIT_OPTIONS);
 
 // Pass `mentor` to correct and resend a rejected application.
@@ -76,66 +76,25 @@ export function MentorApplicationForm({ mentor }: { mentor?: MentorRecord }) {
   return (
     <form.AppForm>
       <form.Form>
-        <FieldSet>
-          <FieldLegend>About you</FieldLegend>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <form.AppField name="name">
-              {(field) => (
-                <field.TextField label="Full name" autoComplete="name" />
-              )}
-            </form.AppField>
-            {!mentor && (
-              <form.AppField name="email">
-                {(field) => (
-                  <field.TextField
-                    label="Email"
-                    type="email"
-                    autoComplete="email"
-                  />
-                )}
-              </form.AppField>
-            )}
-            <form.AppField name="phone">
-              {(field) => (
-                <field.TextField label="Phone" type="tel" autoComplete="tel" />
-              )}
-            </form.AppField>
-            <form.AppField name="itsId">
-              {(field) => (
-                <field.TextField
-                  label="ITS ID"
-                  inputMode="numeric"
-                  maxLength={8}
-                />
-              )}
-            </form.AppField>
-            <form.AppField name="city">
-              {(field) => <field.TextField label="City or area (optional)" />}
-            </form.AppField>
-            <form.AppField name="mohalla">
-              {(field) => (
-                <field.SelectField
-                  label="Mohalla (optional)"
-                  placeholder={
-                    MOHALLA_OPTIONS.length
-                      ? "Choose a mohalla"
-                      : "No options yet"
-                  }
-                  options={MOHALLA_OPTIONS}
-                  disabled={MOHALLA_OPTIONS.length === 0}
-                />
-              )}
-            </form.AppField>
-          </div>
-        </FieldSet>
+        <PersonalFields
+          form={form}
+          fields={{
+            name: "name",
+            email: "email",
+            phone: "phone",
+            itsId: "itsId",
+            city: "city",
+            mohalla: "mohalla",
+          }}
+          // The email can't be changed when resubmitting.
+          showEmail={!mentor}
+        />
 
         <FieldSet>
           <FieldLegend>Your work</FieldLegend>
           <div className="grid gap-5 sm:grid-cols-2">
             <form.AppField name="occupation">
-              {(field) => (
-                <field.TextField label="Job title or profession" />
-              )}
+              {(field) => <field.TextField label="Job title or profession" />}
             </form.AppField>
             <form.AppField name="company">
               {(field) => (
@@ -206,30 +165,10 @@ export function MentorApplicationForm({ mentor }: { mentor?: MentorRecord }) {
         </FieldSet>
 
         {!mentor && (
-          <FieldSet>
-            <FieldLegend>Your password</FieldLegend>
-            <div className="grid gap-5 sm:grid-cols-2">
-              <form.AppField name="password">
-                {(field) => (
-                  <field.TextField
-                    label="Password"
-                    description="At least 8 characters."
-                    type="password"
-                    autoComplete="new-password"
-                  />
-                )}
-              </form.AppField>
-              <form.AppField name="confirmation">
-                {(field) => (
-                  <field.TextField
-                    label="Confirm password"
-                    type="password"
-                    autoComplete="new-password"
-                  />
-                )}
-              </form.AppField>
-            </div>
-          </FieldSet>
+          <PasswordFields
+            form={form}
+            fields={{ password: "password", confirmation: "confirmation" }}
+          />
         )}
 
         {!isPending && <FormMessage {...state} />}

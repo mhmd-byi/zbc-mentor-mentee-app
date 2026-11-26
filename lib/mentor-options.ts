@@ -1,4 +1,4 @@
-// Add the areas of expertise here. They appear as choices on the mentor application.
+// Add the areas here. Mentors pick them as expertise, and mentees as interests.
 export const EXPERTISE_AREAS: readonly string[] = [];
 
 export const AVAILABILITY_OPTIONS = [
