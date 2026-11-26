@@ -118,12 +118,13 @@ export function UserForm({ user, lockRole }: UserFormProps) {
               validators={{ onDynamic: shape.password }}
             >
               {(field) => (
-                // Shown as text so the admin can check it and pass it on.
+                // Starts readable so the admin can check it and pass it on.
                 <field.TextField
                   label="Temporary password"
                   description="They must change it the first time they sign in."
-                  autoComplete="off"
-                  spellCheck={false}
+                  type="password"
+                  defaultVisible
+                  autoComplete="new-password"
                 />
               )}
             </form.AppField>

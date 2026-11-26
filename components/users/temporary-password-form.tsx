@@ -40,8 +40,9 @@ export function TemporaryPasswordForm({ userId }: { userId: string }) {
           {(field) => (
             <field.TextField
               label="New temporary password"
-              autoComplete="off"
-              spellCheck={false}
+              type="password"
+              defaultVisible
+              autoComplete="new-password"
             />
           )}
         </form.AppField>
