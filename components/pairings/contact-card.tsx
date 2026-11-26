@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { DetailsList } from "@/components/layout/details-list";
 import {
   Card,
@@ -8,8 +9,14 @@ import {
 } from "@/components/ui/card";
 import type { Partner } from "@/lib/pairings";
 
+type ContactCardProps = {
+  partner: Partner;
+  // Anything the viewer can do about this person.
+  children?: ReactNode;
+};
+
 // How to reach the person on the other side of a pairing.
-export function ContactCard({ partner }: { partner: Partner }) {
+export function ContactCard({ partner, children }: ContactCardProps) {
   const linkClass = "font-medium text-primary underline-offset-4 hover:underline";
 
   return (
@@ -18,7 +25,7 @@ export function ContactCard({ partner }: { partner: Partner }) {
         <CardTitle className="text-lg font-semibold">{partner.name}</CardTitle>
         <CardDescription>Paired since {partner.since}</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex flex-col gap-5">
         <DetailsList
           details={[
             {
@@ -42,6 +49,7 @@ export function ContactCard({ partner }: { partner: Partner }) {
             { label: "ITS ID", value: partner.itsId },
           ]}
         />
+        {children}
       </CardContent>
     </Card>
   );

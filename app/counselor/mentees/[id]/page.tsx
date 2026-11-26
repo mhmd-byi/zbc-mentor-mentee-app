@@ -11,6 +11,7 @@ import { MenteeDetails } from "@/components/mentees/mentee-details";
 import { AssignMentorList } from "@/components/pairings/assign-mentor-list";
 import { EndPairingForm } from "@/components/pairings/end-pairing-form";
 import { PairingHistory } from "@/components/pairings/pairing-history";
+import { SessionNotesCard } from "@/components/session-notes/session-notes-card";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -26,6 +27,7 @@ import { getMentee, type MenteeRecord } from "@/lib/mentees";
 import { listMentorMatches } from "@/lib/mentors";
 import { listPairings } from "@/lib/pairings";
 import type { FormState } from "@/lib/schemas";
+import { listMenteeNotes } from "@/lib/session-notes";
 
 export const metadata: Metadata = { title: "Mentee" };
 
@@ -63,9 +65,10 @@ async function Mentee({ params, searchParams }: Props) {
   const mentee = await getMentee(id);
   if (!mentee) notFound();
 
-  const [pairings, meetings] = await Promise.all([
+  const [pairings, meetings, notes] = await Promise.all([
     listPairings({ menteeId: id }),
     listMenteeMeetings(id),
+    listMenteeNotes(id),
   ]);
   const current = pairings.find((pairing) => pairing.state === "active");
   const canBePaired =
@@ -111,6 +114,9 @@ async function Mentee({ params, searchParams }: Props) {
       {!current && canBePaired && <AssignMentor mentee={mentee} />}
       {(current || meetings.length > 0) && (
         <MeetingRecords meetings={meetings} />
+      )}
+      {(current || notes.length > 0) && (
+        <SessionNotesCard notes={notes} forCounselor />
       )}
 
       <Card>

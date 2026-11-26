@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Dashboard } from "@/components/dashboard/dashboard";
 import { EmptyState } from "@/components/dashboard/empty-state";
@@ -6,6 +7,7 @@ import { MyMeetings } from "@/components/meetings/my-meetings";
 import { MentorApplicationForm } from "@/components/mentors/mentor-application-form";
 import { MentorDetails } from "@/components/mentors/mentor-details";
 import { ContactCard } from "@/components/pairings/contact-card";
+import { buttonVariants } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -98,7 +100,17 @@ async function Mentees({ limit }: { limit: number | null }) {
         {limit !== null && ` of ${limit}`})
       </h2>
       {mentees.map((mentee) => (
-        <ContactCard key={mentee.id} partner={mentee} />
+        <ContactCard key={mentee.id} partner={mentee}>
+          <Link
+            href={`/mentor/notes/${mentee.pairingId}`}
+            className={buttonVariants({
+              variant: "secondary",
+              className: "self-start",
+            })}
+          >
+            Session notes
+          </Link>
+        </ContactCard>
       ))}
     </>
   );

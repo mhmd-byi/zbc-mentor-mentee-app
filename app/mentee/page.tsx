@@ -5,6 +5,7 @@ import { Dashboard } from "@/components/dashboard/dashboard";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { MyMeetings } from "@/components/meetings/my-meetings";
 import { ContactCard } from "@/components/pairings/contact-card";
+import { SessionNotesCard } from "@/components/session-notes/session-notes-card";
 import {
   Card,
   CardContent,
@@ -14,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { getOwnEmailStatus } from "@/lib/mentees";
 import { getMyMentor } from "@/lib/pairings";
+import { listMyNotes } from "@/lib/session-notes";
 
 export const metadata: Metadata = { title: "Mentee" };
 
@@ -55,6 +57,7 @@ async function MenteeHome() {
 
   const mentor = await getMyMentor();
   if (mentor) {
+    const notes = await listMyNotes();
     return (
       <>
         <MyMeetings partners={[mentor]} />
@@ -62,6 +65,7 @@ async function MenteeHome() {
           Your mentor
         </h2>
         <ContactCard partner={mentor} />
+        <SessionNotesCard notes={notes} />
       </>
     );
   }

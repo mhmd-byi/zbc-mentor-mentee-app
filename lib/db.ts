@@ -103,6 +103,19 @@ export type MeetingDocument = {
   reason?: string;
 };
 
+// A mentor's record of one mentoring session. The mentee and counselors read it.
+export type SessionNoteDocument = {
+  pairingId: ObjectId;
+  mentorId: ObjectId;
+  menteeId: ObjectId;
+  // The day it took place, as YYYY-MM-DD.
+  date: string;
+  summary: string;
+  nextSteps: string;
+  createdAt: Date;
+  updatedAt?: Date;
+};
+
 // Reused across requests (and dev reloads) so each one doesn't open a new connection.
 const globalForMongo = globalThis as typeof globalThis & {
   mongoClient?: MongoClient;
@@ -132,6 +145,17 @@ export function ensureMeetingIndexes() {
   return getMeetings().createIndexes([
     { key: { pairingId: 1, startsAt: -1 } },
     { key: { menteeId: 1, startsAt: -1 } },
+  ]);
+}
+
+export function getSessionNotes() {
+  return getClient().db().collection<SessionNoteDocument>("sessionNotes");
+}
+
+export function ensureSessionNoteIndexes() {
+  return getSessionNotes().createIndexes([
+    { key: { pairingId: 1, date: -1 } },
+    { key: { menteeId: 1, date: -1 } },
   ]);
 }
 
