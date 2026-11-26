@@ -9,7 +9,11 @@ import { PersonalFields } from "@/components/signup/personal-fields";
 import { FieldLegend, FieldSet } from "@/components/ui/field";
 import { FormMessage } from "@/components/ui/form-message";
 import { PendingButton } from "@/components/ui/pending-button";
-import { menteeSignupSchema, type MenteeFormValues } from "@/lib/mentee-schema";
+import {
+  latestAdultBirthDate,
+  menteeSignupSchema,
+  type MenteeFormValues,
+} from "@/lib/mentee-schema";
 import { AVAILABILITY_OPTIONS } from "@/lib/mentor-options";
 
 const DEFAULT_VALUES: MenteeFormValues = {
@@ -69,11 +73,11 @@ export function MenteeSignupForm() {
           <div className="grid gap-5 sm:grid-cols-2">
             <form.AppField name="dateOfBirth">
               {(field) => (
-                <field.TextField
+                <field.DateField
                   label="Date of birth"
                   description="Mentees must be 18 or older."
-                  type="date"
-                  autoComplete="bday"
+                  min="1920-01-01"
+                  max={latestAdultBirthDate}
                 />
               )}
             </form.AppField>

@@ -70,12 +70,10 @@ export function ProposeMeetingForm({
         )}
         <div className="grid gap-5 sm:grid-cols-2">
           <form.AppField name="date">
-            {(field) => (
-              <field.TextField label="Date" type="date" min={today} />
-            )}
+            {(field) => <field.DateField label="Date" min={today} />}
           </form.AppField>
           <form.AppField name="time">
-            {(field) => <field.TextField label="Time (IST)" type="time" />}
+            {(field) => <field.TimeField label="Time (IST)" />}
           </form.AppField>
         </div>
         <form.AppField name="location">

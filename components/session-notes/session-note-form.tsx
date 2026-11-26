@@ -49,9 +49,7 @@ export function SessionNoteForm({
     <form.AppForm>
       <form.Form>
         <form.AppField name="date">
-          {(field) => (
-            <field.TextField label="Session date" type="date" max={today} />
-          )}
+          {(field) => <field.DateField label="Session date" max={today} />}
         </form.AppField>
         <form.AppField name="summary">
           {(field) => (

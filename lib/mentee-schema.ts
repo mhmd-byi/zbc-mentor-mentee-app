@@ -10,7 +10,7 @@ import { userSchema } from "./user-schema";
 const ADULT_AGE = 18;
 
 // The latest birth date that makes someone an adult today, going by India's date.
-function latestAdultBirthDate() {
+export function latestAdultBirthDate() {
   const [year, month, day] = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Kolkata",
   })
