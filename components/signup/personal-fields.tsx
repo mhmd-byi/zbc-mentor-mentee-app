@@ -58,12 +58,9 @@ export const PersonalFields = withFieldGroup({
           <group.AppField name="mohalla">
             {(field) => (
               <field.SelectField
-                label="Mohalla (optional)"
-                placeholder={
-                  MOHALLA_OPTIONS.length ? "Choose a mohalla" : "No options yet"
-                }
+                label="Mohalla"
+                placeholder="Choose a mohalla"
                 options={MOHALLA_OPTIONS}
-                disabled={MOHALLA_OPTIONS.length === 0}
               />
             )}
           </group.AppField>

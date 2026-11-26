@@ -27,10 +27,7 @@ export const userSchema = z.object({
   city: z.string().trim().max(100, "Use 100 characters or fewer."),
   mohalla: z
     .string()
-    .refine(
-      (value) => value === "" || MOHALLAS.includes(value),
-      "Choose a mohalla from the list.",
-    ),
+    .refine((value) => MOHALLAS.includes(value), "Choose a mohalla."),
 });
 
 export const newUserSchema = userSchema.extend({ password: passwordSchema });
