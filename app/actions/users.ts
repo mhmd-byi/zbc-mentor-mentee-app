@@ -3,13 +3,13 @@
 import { ObjectId } from "mongodb";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { sendPasswordResetEmail, sendWelcomeEmail } from "@/lib/account-emails";
 import { requireRole } from "@/lib/auth";
 import {
   duplicateKeyMessage,
   ensureUserIndexes,
   getUsers,
   inTransaction,
-  type UserDocument,
 } from "@/lib/db";
 import { notifyPairings } from "@/lib/pairing-emails";
 import { endActivePairings, type PairingIds } from "@/lib/pairing-service";
@@ -22,15 +22,6 @@ import {
 } from "@/lib/user-schema";
 
 const NOT_FOUND = "That account no longer exists.";
-
-async function updateById(id: string, changes: Partial<UserDocument>) {
-  if (!ObjectId.isValid(id)) return false;
-  const result = await getUsers().updateOne(
-    { _id: new ObjectId(id) },
-    { $set: changes },
-  );
-  return result.matchedCount === 1;
-}
 
 // Emails the people whose pairings a change ended, and words it for the admin.
 async function announceEnded(ended: PairingIds[]) {
@@ -66,8 +57,9 @@ export async function createUser(
     return { error: duplicateKeyMessage(error) };
   }
 
+  const emailed = await sendWelcomeEmail(details);
   revalidatePath("/admin", "layout");
-  redirect("/admin?created");
+  redirect(`/admin?created=${emailed ? "emailed" : "no-email"}`);
 }
 
 export async function updateUser(
@@ -127,16 +119,33 @@ export async function setTemporaryPassword(
   const parsed = passwordSchema.safeParse(values.password);
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
-  const updated = await updateById(userId, {
-    passwordHash: await hashPassword(parsed.data),
-    mustChangePassword: true,
-    passwordChangedAt: new Date(),
-  });
-  if (!updated) return { error: NOT_FOUND };
+  if (!ObjectId.isValid(userId)) return { error: NOT_FOUND };
+  const user = await getUsers().findOneAndUpdate(
+    { _id: new ObjectId(userId) },
+    {
+      $set: {
+        passwordHash: await hashPassword(parsed.data),
+        mustChangePassword: true,
+        passwordChangedAt: new Date(),
+      },
+    },
+    { projection: { name: 1, email: 1, status: 1 } },
+  );
+  if (!user) return { error: NOT_FOUND };
 
+  const done =
+    "Temporary password set. They've been signed out and must change it at their next sign-in.";
+  // Someone deactivated can't sign in, so an email would only mislead them.
+  if (user.status !== "active") {
+    return {
+      success: `${done} Their account is deactivated, so they weren't emailed.`,
+    };
+  }
+  const emailed = await sendPasswordResetEmail(user);
   return {
-    success:
-      "Temporary password set. They've been signed out and must change it at their next sign-in.",
+    success: emailed
+      ? `${done} We've emailed them; share the password with them privately.`
+      : `${done} We couldn't email them, so tell them and share the password privately.`,
   };
 }
 

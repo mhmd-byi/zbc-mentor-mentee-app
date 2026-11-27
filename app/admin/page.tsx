@@ -25,8 +25,11 @@ async function Users({
 
   return (
     <>
-      {created !== undefined && (
-        <FormMessage success="Account created. Share the temporary password with them privately." />
+      {created === "emailed" && (
+        <FormMessage success="Account created, and we've emailed them. Share the temporary password with them privately." />
+      )}
+      {created === "no-email" && (
+        <FormMessage error="Account created, but we couldn't email them. Tell them yourself and share the temporary password privately." />
       )}
       <UsersTable users={users} />
     </>

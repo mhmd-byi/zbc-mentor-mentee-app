@@ -118,7 +118,7 @@ export function UserForm({ user, lockRole }: UserFormProps) {
                 // Starts readable so the admin can check it and pass it on.
                 <field.TextField
                   label="Temporary password"
-                  description="They must change it the first time they sign in."
+                  description="Copy it now: it isn't emailed or shown again. They change it at first sign-in."
                   type="password"
                   defaultVisible
                   autoComplete="new-password"

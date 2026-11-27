@@ -40,6 +40,7 @@ export function TemporaryPasswordForm({ userId }: { userId: string }) {
           {(field) => (
             <field.TextField
               label="New temporary password"
+              description="Copy it before saving: it isn't emailed or shown again."
               type="password"
               defaultVisible
               autoComplete="new-password"

@@ -14,7 +14,7 @@ export default function NewUserPage() {
         <BackLink href="/admin">All users</BackLink>
         <PageHeader
           title="Add user"
-          description="Create an account and give them a temporary password."
+          description="They'll be emailed about the account. You give them the temporary password yourself."
         />
         <Card>
           <CardContent>

@@ -73,8 +73,8 @@ async function EditUser({
             <CardHeader>
               <CardTitle>Temporary password</CardTitle>
               <CardDescription>
-                Use this if they can&apos;t sign in. It signs them out
-                everywhere.
+                Use this if they can&apos;t sign in. It signs them out everywhere
+                and emails them that it was reset.
               </CardDescription>
             </CardHeader>
             <CardContent>
