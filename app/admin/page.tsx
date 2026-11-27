@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Dashboard } from "@/components/dashboard/dashboard";
+import { buttonVariants } from "@/components/ui/button";
 import { FormMessage } from "@/components/ui/form-message";
 import { UsersTable } from "@/components/users/users-table";
 import { listUsers } from "@/lib/users";
@@ -31,6 +33,15 @@ async function Users({
       {created === "no-email" && (
         <FormMessage error="Account created, but we couldn't email them. Tell them yourself and share the temporary password privately." />
       )}
+      <Link
+        href="/admin/email"
+        className={buttonVariants({
+          variant: "secondary",
+          className: "self-end",
+        })}
+      >
+        Test email
+      </Link>
       <UsersTable users={users} />
     </>
   );
